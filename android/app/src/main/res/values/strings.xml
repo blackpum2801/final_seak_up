@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Speak Up</string>
+    <string name="facebook_app_id">1652930868736775</string>
+    <string name="facebook_client_token">66dd00ef93a5fd47b51c83f9b5e64ead</string>
+    <string name="fb_login_protocol_scheme">fb1652930868736775</string>
+</resources>

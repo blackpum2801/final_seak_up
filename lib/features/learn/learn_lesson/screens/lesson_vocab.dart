@@ -251,8 +251,6 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                                           expectedWord: vocab.word,
                                           onResult: (success, spoken,
                                               confidence, feedback) async {
-                                            await speechProvider
-                                                .stopListeningManually();
                                             if (mounted) {
                                               setState(() {
                                                 _isCorrect = success;
@@ -264,6 +262,13 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                                                     const SnackBar(
                                                         content: Text(
                                                             'Không nhận diện được giọng nói.')),
+                                                  );
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                        content: Text(
+                                                            'Đang ghi âm để chấm điểm, hãy đọc lại...')),
                                                   );
                                                 }
                                               });

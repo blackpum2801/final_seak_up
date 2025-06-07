@@ -99,21 +99,10 @@ class SpeechToTextProvider with ChangeNotifier {
       return;
     }
 
-    final dir = await getTemporaryDirectory();
-    _audioPath = '${dir.path}/recorded.wav';
     _recognizedWord = '';
     _confidenceLevel = 0.0;
     _accuracy = null;
-
-    try {
-      if (_recorder.isRecording) await _recorder.stopRecorder();
-      await _recorder.startRecorder(toFile: _audioPath, codec: Codec.pcm16WAV);
-      debugPrint('🎙 Bắt đầu ghi âm: $_audioPath');
-    } catch (e) {
-      debugPrint('❌ Không thể ghi âm: $e');
-      onResult(false, '', 0.0, '❌ Lỗi ghi âm');
-      return;
-    }
+    _audioPath = null;
 
     _setListening(true);
     bool resultSent = false;
@@ -159,9 +148,8 @@ class SpeechToTextProvider with ChangeNotifier {
       Function(bool, String, double, String) onResult) async {
     try {
       await _speech.stop();
-      if (_recorder.isRecording) await _recorder.stopRecorder();
     } catch (e) {
-      debugPrint('❌ stop/send error: $e');
+      debugPrint('❌ stop error: $e');
     }
     _setListening(false);
 
@@ -170,6 +158,22 @@ class SpeechToTextProvider with ChangeNotifier {
         ? '✅ Bạn phát âm chính xác!'
         : '❌ Bạn phát âm chưa đúng. Hãy thử lại.';
     onResult(matched, _recognizedWord, _confidenceLevel, feedback);
+
+    // 📼 Record pronunciation again for scoring
+    try {
+      final dir = await getTemporaryDirectory();
+      _audioPath = '${dir.path}/recorded.wav';
+
+      if (_recorder.isRecording) await _recorder.stopRecorder();
+      await _recorder.startRecorder(
+          toFile: _audioPath, codec: Codec.pcm16WAV);
+      debugPrint('🎙 Ghi âm đánh giá: $_audioPath');
+      await Future.delayed(const Duration(seconds: 2));
+      await _recorder.stopRecorder();
+    } catch (e) {
+      debugPrint('❌ Không thể ghi âm: $e');
+      return;
+    }
 
     if (_audioPath == null || !File(_audioPath!).existsSync()) {
       debugPrint('⚠️ Không tìm thấy file ghi âm');

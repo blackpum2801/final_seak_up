@@ -27,6 +27,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
   TopicModel? topic;
   List<LessonModel> lessons = [];
   bool isLoading = true;
+  final Map<String, int> _subLessonCounts = {};
 
   @override
   void initState() {
@@ -41,6 +42,14 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     final fetchedTopic = await topicProvider.fetchTopicById(widget.topicId);
     final fetchedLessons =
         await lessonProvider.fetchLessonsByParentTopic(widget.topicId);
+
+    final countFutures = fetchedLessons
+        .map((l) => lessonProvider.fetchSubLessonCount(l.id))
+        .toList();
+    final counts = await Future.wait(countFutures);
+    for (var i = 0; i < fetchedLessons.length; i++) {
+      _subLessonCounts[fetchedLessons[i].id] = counts[i];
+    }
 
     setState(() {
       topic = fetchedTopic;
@@ -80,13 +89,8 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
                   itemCount: lessons.length,
                   itemBuilder: (context, index) {
                     final lesson = lessons[index];
-                    return FutureBuilder<int>(
-                      future: context
-                          .read<LessonProvider>()
-                          .fetchSubLessonCount(lesson.id),
-                      builder: (context, snapshot) {
-                        final total = snapshot.data ?? 0;
-                        return GestureDetector(
+                    final total = _subLessonCounts[lesson.id] ?? 0;
+                    return GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,

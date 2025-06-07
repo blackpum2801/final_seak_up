@@ -54,44 +54,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: AppRouter.router,
-      // Thêm theme tối ưu hóa
       theme: ThemeData(
         useMaterial3: true,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // Màn hình chờ khi khởi tạo
-      builder: (context, child) {
-        return FutureBuilder(
-          future: Future.wait([
-            Firebase.initializeApp(),
-            dotenv.load(fileName: ".env"),
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const MaterialApp(
-                debugShowCheckedModeBanner: false,
-                home: Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                ),
-              );
-            }
-            if (snapshot.hasError) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                home: Scaffold(
-                  body: Center(
-                    child: Text(
-                      'Lỗi khởi tạo: ${snapshot.error}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-                ),
-              );
-            }
-            return child!;
-          },
-        );
-      },
     );
   }
 }

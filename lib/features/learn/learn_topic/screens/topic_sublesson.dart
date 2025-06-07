@@ -4,7 +4,7 @@ import 'package:speak_up/core/constants/asset_color.dart';
 import 'package:speak_up/models/lesson.dart';
 import 'package:speak_up/provider/lesson.dart';
 
-class SubLessonScreen extends StatelessWidget {
+class SubLessonScreen extends StatefulWidget {
   final String parentLessonId;
   final String title;
 
@@ -15,16 +15,30 @@ class SubLessonScreen extends StatelessWidget {
   });
 
   @override
+  State<SubLessonScreen> createState() => _SubLessonScreenState();
+}
+
+class _SubLessonScreenState extends State<SubLessonScreen> {
+  late Future<List<LessonModel>> _subLessonsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _subLessonsFuture =
+        context.read<LessonProvider>().fetchSubLessons(widget.parentLessonId);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title, style: const TextStyle(color: Colors.white)),
+        title: Text(widget.title, style: const TextStyle(color: Colors.white)),
         backgroundColor: AppColors.background,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: AppColors.background,
       body: FutureBuilder<List<LessonModel>>(
-        future: context.read<LessonProvider>().fetchSubLessons(parentLessonId),
+        future: _subLessonsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

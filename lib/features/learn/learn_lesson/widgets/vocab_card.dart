@@ -9,6 +9,7 @@ class VocabularyCard extends StatelessWidget {
   final double confidenceLevel;
   final double? accuracy;
   final String feedback;
+  final String spokenWord;
   final VoidCallback onPlayAudio;
   final VoidCallback onPlaySlowAudio;
 
@@ -18,6 +19,7 @@ class VocabularyCard extends StatelessWidget {
     required this.confidenceLevel,
     this.accuracy,
     required this.feedback,
+    required this.spokenWord,
     required this.onPlayAudio,
     required this.onPlaySlowAudio,
   });
@@ -88,6 +90,13 @@ class VocabularyCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(feedback,
                         style: const TextStyle(color: Colors.red)),
+                  ),
+                if (spokenWord.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text('Bạn nói: $spokenWord',
+                        style: const TextStyle(
+                            fontSize: 16, color: Colors.blue)),
                   ),
               ],
             ),

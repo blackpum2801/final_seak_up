@@ -29,6 +29,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
   late final PageController _pageController;
   int _currentIndex = 0;
   bool _isCorrect = false;
+  String _spokenWord = '';
   String _feedback = '';
 
   @override
@@ -136,6 +137,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
       setState(() {
         _currentIndex++;
         _isCorrect = false;
+        _spokenWord = '';
         _feedback = '';
       });
       _pageController.animateToPage(
@@ -180,6 +182,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                           setState(() {
                             _currentIndex = index;
                             _isCorrect = false;
+                            _spokenWord = '';
                             _feedback = '';
                           });
                           final audio = vocabList[index].audioUrl;
@@ -191,6 +194,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                         isListening: speechProvider.isListening,
                         confidenceLevel: speechProvider.confidenceLevel,
                         accuracy: speechProvider.accuracy,
+                        spokenWord: _spokenWord,
                         feedback: _feedback,
                         onPlayAudio: () {
                           final audioUrl = vocabList[index].audioUrl ?? '';
@@ -255,6 +259,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                                                 .stopListeningManually();
                                             if (mounted) {
                                               setState(() {
+                                                _spokenWord = spoken;
                                                 _isCorrect = success;
                                                 _feedback = feedback;
                                                 if (!success &&

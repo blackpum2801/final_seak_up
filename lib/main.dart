@@ -9,6 +9,7 @@ import 'package:speak_up/provider/chat_provider.dart';
 import 'package:speak_up/provider/course.dart';
 import 'package:speak_up/provider/dashboard.dart';
 import 'package:speak_up/provider/lesson.dart';
+import 'package:speak_up/provider/progress.dart';
 import 'package:speak_up/provider/speech.dart';
 import 'package:speak_up/provider/topic.dart';
 import 'package:speak_up/provider/user.dart';
@@ -41,6 +42,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AiLessonProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => DashboardProvider()),
+        ChangeNotifierProvider(create: (_) => ProgressProvider()),
       ],
       child: const MyApp(),
     ),

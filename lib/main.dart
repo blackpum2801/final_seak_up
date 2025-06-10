@@ -7,6 +7,7 @@ import 'package:speak_up/core/routing/app_router.dart';
 import 'package:speak_up/provider/ai_conversation.dart';
 import 'package:speak_up/provider/chat_provider.dart';
 import 'package:speak_up/provider/course.dart';
+import 'package:speak_up/provider/dashboard.dart';
 import 'package:speak_up/provider/lesson.dart';
 import 'package:speak_up/provider/speech.dart';
 import 'package:speak_up/provider/topic.dart';
@@ -25,7 +26,6 @@ void main() async {
     }
   } catch (e) {
     debugPrint("❌ Lỗi khởi tạo: $e");
-    // Có thể hiển thị một màn hình lỗi hoặc thoát ứng dụng
   }
 
   runApp(
@@ -35,11 +35,12 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CourseProvider()),
         ChangeNotifierProvider(create: (_) => LessonProvider()),
         ChangeNotifierProvider(create: (_) => VocabularyProvider()),
-        ChangeNotifierProvider(create: (_) => SpeechToTextProvider()),
+        ChangeNotifierProvider(create: (_) => SpeechProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => TopicProvider()),
         ChangeNotifierProvider(create: (_) => AiLessonProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => DashboardProvider()),
       ],
       child: const MyApp(),
     ),

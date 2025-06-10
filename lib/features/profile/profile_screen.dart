@@ -5,6 +5,7 @@ import 'package:speak_up/core/constants/asset_color.dart';
 import 'package:speak_up/core/constants/assets.dart';
 import 'package:speak_up/core/routing/route_names.dart';
 import 'package:speak_up/core/services/app_services.dart';
+import 'package:speak_up/features/profile/dashboard.dart';
 import 'package:speak_up/features/profile/profile_edit/screens/edit_screen.dart';
 import 'package:speak_up/features/profile/widgets/list_tile_custom.dart';
 import 'package:speak_up/widgets/custom_text.dart';
@@ -138,6 +139,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Chức năng đang phát triển')),
+                );
+              },
+            ),
+            CustomListTile(
+              leadingIcon: Icons.bar_chart,
+              title: 'Thành tích học tập',
+              onTap: () async {
+                // Lấy userId từ secure storage
+                final storage = FlutterSecureStorage();
+                final userId = await storage.read(key: 'userId') ?? '';
+                if (userId.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Không tìm thấy userId!')),
+                  );
+                  return;
+                }
+                if (!context.mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => DashboardScreen(userId: userId),
+                  ),
                 );
               },
             ),

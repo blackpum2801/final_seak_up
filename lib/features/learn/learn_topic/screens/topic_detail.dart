@@ -27,6 +27,7 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
   TopicModel? topic;
   List<LessonModel> lessons = [];
   bool isLoading = true;
+  final Map<String, int> _subLessonCounts = {};
 
   @override
   void initState() {
@@ -42,6 +43,14 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     final fetchedLessons =
         await lessonProvider.fetchLessonsByParentTopic(widget.topicId);
 
+    final countFutures = fetchedLessons
+        .map((l) => lessonProvider.fetchSubLessonCount(l.id))
+        .toList();
+    final counts = await Future.wait(countFutures);
+    for (var i = 0; i < fetchedLessons.length; i++) {
+      _subLessonCounts[fetchedLessons[i].id] = counts[i];
+    }
+
     setState(() {
       topic = fetchedTopic;
       lessons = fetchedLessons;
@@ -54,82 +63,73 @@ class _TopicDetailScreenState extends State<TopicDetailScreen> {
     final wishlistProvider = context.watch<WishlistProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(
-          widget.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
         backgroundColor: AppColors.background,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+        appBar: AppBar(
+          title: Text(
+            widget.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor: AppColors.background,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : topic == null
-              ? const Center(child: Text('Không tìm thấy chủ đề'))
-              : ListView.builder(
-                  itemCount: lessons.length,
-                  itemBuilder: (context, index) {
-                    final lesson = lessons[index];
-                    return FutureBuilder<int>(
-                      future: context
-                          .read<LessonProvider>()
-                          .fetchSubLessonCount(lesson.id),
-                      builder: (context, snapshot) {
-                        final total = snapshot.data ?? 0;
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => SubLessonScreen(
-                                  parentLessonId: lesson.id,
-                                  title: lesson.title,
-                                ),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : topic == null
+                ? const Center(child: Text('Không tìm thấy chủ đề'))
+                : ListView.builder(
+                    itemCount: lessons.length,
+                    itemBuilder: (context, index) {
+                      final lesson = lessons[index];
+                      final total = _subLessonCounts[lesson.id] ?? 0;
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SubLessonScreen(
+                                parentLessonId: lesson.id,
+                                title: lesson.title,
                               ),
-                            );
+                            ),
+                          );
+                        },
+                        child: TopicCard(
+                          image: lesson.thumbnail ?? topic!.thumbnail,
+                          title: lesson.title,
+                          subtitle: lesson.content ?? '',
+                          lesson: '$total Bài học',
+                          isHorizontal: true,
+                          isFavorite: wishlistProvider.isInWishlist(lesson.id),
+                          onFavoriteToggle: () async {
+                            if (wishlistProvider.isInWishlist(lesson.id)) {
+                              await wishlistProvider
+                                  .removeFromWishlist(lesson.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Đã xoá khỏi danh sách yêu thích')),
+                              );
+                            } else {
+                              await wishlistProvider.addToWishlist(lesson.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Đã thêm yêu thích thành công')),
+                              );
+                            }
                           },
-                          child: TopicCard(
-                            image: lesson.thumbnail ?? topic!.thumbnail,
-                            title: lesson.title,
-                            subtitle: lesson.content ?? '',
-                            lesson: '$total Bài học',
-                            isHorizontal: true,
-                            isFavorite:
-                                wishlistProvider.isInWishlist(lesson.id),
-                            onFavoriteToggle: () async {
-                              if (wishlistProvider.isInWishlist(lesson.id)) {
-                                await wishlistProvider
-                                    .removeFromWishlist(lesson.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Đã xoá khỏi danh sách yêu thích')),
-                                );
-                              } else {
-                                await wishlistProvider.addToWishlist(lesson.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content:
-                                          Text('Đã thêm yêu thích thành công')),
-                                );
-                              }
-                            },
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-    );
+                        ),
+                      );
+                    },
+                  ));
   }
 }

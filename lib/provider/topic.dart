@@ -57,10 +57,15 @@ class TopicProvider extends ChangeNotifier {
 
       debugPrint("📦 Có ${topics.length} topic (section = topic)");
 
-      for (final topic in topics) {
-        final topicId = topic.id;
-        final lessonRes =
-            await _dio.get('/lesson/getLessonByParentTopicId/$topicId');
+      final lessonResponses = await Future.wait(
+        topics.map(
+          (t) => _dio.get('/lesson/getLessonByParentTopicId/${t.id}'),
+        ),
+      );
+
+      for (var i = 0; i < topics.length; i++) {
+        final topicId = topics[i].id;
+        final lessonRes = lessonResponses[i];
         final data = lessonRes.data['rs'] ?? [];
 
         final parentLessons = (data as List)
@@ -70,7 +75,7 @@ class TopicProvider extends ChangeNotifier {
 
         topicLessons[topicId] = parentLessons;
 
-        debugPrint("✅ ${topic.title} có ${parentLessons.length} bài học cha");
+        debugPrint("✅ ${topics[i].title} có ${parentLessons.length} bài học cha");
       }
 
       _generateTrendingLessons();

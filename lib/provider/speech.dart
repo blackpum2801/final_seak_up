@@ -13,7 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class SpeechProvider extends ChangeNotifier {
-  static const String apiMainPathSts = "http://10.0.2.2:3000";
+  static const String apiMainPathSts = "http://192.168.27.209:3000";
   static const String stScoreApiKey =
       "rll5QsTiv83nti99BW6uCmvs9BDVxSB39SVFceYb";
   static const int badScoreThreshold = 30;

@@ -13,14 +13,20 @@ class LessonProgressModel {
     required this.isCompleted,
   });
 
+  // Hàm parse an toàn
+  static String parseId(dynamic input) {
+    if (input == null) return '';
+    if (input is Map && input['_id'] != null) return input['_id'].toString();
+    return input.toString();
+  }
+
   factory LessonProgressModel.fromJson(Map<String, dynamic> json) {
     return LessonProgressModel(
-      id: json['_id'] ?? '',
-      lessonId:
-          json['lessonId'] is Map ? json['lessonId']['_id'] : json['lessonId'],
-      userId: json['userId'] is Map ? json['userId']['_id'] : json['userId'],
+      id: json['_id']?.toString() ?? '',
+      lessonId: parseId(json['lessonId']),
+      userId: parseId(json['userId']),
       score: (json['score'] as num?)?.toDouble() ?? 0.0,
-      isCompleted: json['isCompleted'] ?? false,
+      isCompleted: json['isCompleted'] == true,
     );
   }
 

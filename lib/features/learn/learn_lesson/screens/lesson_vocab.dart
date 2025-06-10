@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:speak_up/provider/speech.dart';
 import 'package:speak_up/provider/vocabulary.dart';
 import 'package:provider/provider.dart';
@@ -94,14 +95,14 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
     final score = speechProvider.phonemeScore;
 
     setState(() {
-      isCorrect = score > 60
+      isCorrect = score >= 70
           ? "correct"
           : score >= 40
               ? "nearly"
               : "incorrect";
       isChecked = true;
       totalCount++;
-      if (score > 60) {
+      if (score >= 70) {
         correctCount++;
       }
     });
@@ -433,7 +434,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                       const SizedBox(height: 8),
                       Text(
                         currentIpa.isNotEmpty ? currentIpa : 'N/A',
-                        style: const TextStyle(
+                        style: GoogleFonts.notoSans(
                           fontSize: 20,
                           color: Colors.blue,
                         ),
@@ -496,7 +497,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              speechProvider.phonemeScore > 60
+                              speechProvider.phonemeScore >= 70
                                   ? '😊'
                                   : speechProvider.phonemeScore >= 40
                                       ? '😐'
@@ -509,7 +510,7 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    speechProvider.phonemeScore > 60
+                                    speechProvider.phonemeScore >= 70
                                         ? 'Xuất sắc!'
                                         : speechProvider.phonemeScore >= 40
                                             ? 'Tốt!'
@@ -575,22 +576,24 @@ class _VocabularyListScreenState extends State<VocabularyListScreen> {
                                 style: TextStyle(color: Colors.white),
                               ),
                             ),
-                            const SizedBox(width: 16),
-                            ElevatedButton(
-                              onPressed: () => _handleNext(vocabulary),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(25),
+                            if (speechProvider.phonemeScore >= 70) ...[
+                              const SizedBox(width: 16),
+                              ElevatedButton(
+                                onPressed: () => _handleNext(vocabulary),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
                                 ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
+                                child: const Text(
+                                  'Tiếp tục',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                               ),
-                              child: const Text(
-                                'Tiếp tục',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
+                            ],
                           ],
                         ),
                       ],
